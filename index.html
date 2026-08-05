@@ -208,6 +208,12 @@
   .btn-line{background:#06C755;color:#fff;border:none;font-weight:700}
   .btn-return{background:#FBFAEA;color:var(--bg);border:1px solid var(--wine)}
   .hint{font-size:11px;color:#8B885F;text-align:center;margin-top:10px;letter-spacing:1px}
+  .asap-check{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--bg);margin-bottom:8px}
+  .asap-check input{width:16px;height:16px;accent-color:var(--olive)}
+  .time-wheels{display:flex;align-items:center;gap:10px;transition:opacity .2s}
+  .time-wheels.disabled{opacity:.35;pointer-events:none}
+  .time-wheels select{flex:1;text-align:center}
+  .time-wheels .colon{font-size:18px;font-weight:700;color:var(--wine)}
   .member-bar{
     display:flex;align-items:center;justify-content:center;gap:10px;
     background:var(--wine);color:#fff;
@@ -273,11 +279,18 @@
     </div>
     <div class="field">
       <label>取餐時間</label>
-      <select id="fTime"></select>
+      <label class="asap-check">
+        <input type="checkbox" id="fAsap" checked> 盡快取餐（現場稍候）
+      </label>
+      <div class="time-wheels disabled" id="timeWheels">
+        <select id="fHour"></select>
+        <span class="colon">：</span>
+        <select id="fMinute"></select>
+      </div>
     </div>
     <div class="field">
-      <label>備註（客製需求）</label>
-      <textarea id="fNote" placeholder="例：少冰、不加蜂蜜⋯"></textarea>
+      <label>備註</label>
+      <textarea id="fNote"></textarea>
     </div>
     <div class="btns">
       <button class="btn-return" onclick="closeSheet()">返回修改</button>
@@ -461,19 +474,23 @@ function updateBar(){
   $("barBtn").disabled = cups===0;
 }
 
-function renderTimes(){
-  const opts = ['<option value="盡快取餐">盡快取餐（現場稍候）</option>'];
-  const now = new Date();
+function renderTimeWheels(){
+  const hOpts = [];
   for(let h=CONFIG.OPEN_HOUR; h<CONFIG.CLOSE_HOUR; h++){
-    for(let m=0; m<60; m+=CONFIG.SLOT_MINUTES){
-      const t = new Date(); t.setHours(h,m,0,0);
-      if(t < new Date(now.getTime()+10*60000)) continue; // 至少10分鐘後
-      const s = `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}`;
-      opts.push(`<option value="${s}">${s}</option>`);
-    }
+    hOpts.push(`<option value="${h}">${String(h).padStart(2,"0")}</option>`);
   }
-  $("fTime").innerHTML = opts.join("");
+  $("fHour").innerHTML = hOpts.join("");
+
+  const mOpts = [];
+  for(let m=0; m<60; m+=CONFIG.SLOT_MINUTES){
+    mOpts.push(`<option value="${m}">${String(m).padStart(2,"0")}</option>`);
+  }
+  $("fMinute").innerHTML = mOpts.join("");
 }
+
+$("fAsap").addEventListener("change", ()=>{
+  $("timeWheels").classList.toggle("disabled", $("fAsap").checked);
+});
 
 function renderSum(){
   const {cups, amt} = totals();
@@ -493,7 +510,10 @@ function buildOrder(){
   const {cups, amt} = totals();
   lines.push("━━━━━━━━━━");
   lines.push(`合計：${cups} 杯　$${amt}`);
-  lines.push(`取餐時間：${$("fTime").value}`);
+  const timeStr = $("fAsap").checked
+    ? "盡快取餐（現場稍候）"
+    : `${String($("fHour").value).padStart(2,"0")}:${String($("fMinute").value).padStart(2,"0")}`;
+  lines.push(`取餐時間：${timeStr}`);
   const name = $("fName").value.trim(), phone = $("fPhone").value.trim(), note = $("fNote").value.trim();
   if(name)  lines.push(`姓名：${name}`);
   if(phone) lines.push(`電話：${phone}`);
@@ -520,7 +540,7 @@ $("btnSend").addEventListener("click", ()=>{
 });
 
 renderMenu();
-renderTimes();
+renderTimeWheels();
 updateBar();
 </script>
 </body>
