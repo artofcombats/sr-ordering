@@ -208,26 +208,29 @@
   .btn-line{background:#06C755;color:#fff;border:none;font-weight:700}
   .btn-return{background:#FBFAEA;color:var(--bg);border:1px solid var(--wine)}
   .hint{font-size:11px;color:#8B885F;text-align:center;margin-top:10px;letter-spacing:1px}
-  .asap-check{display:flex;align-items:center;gap:7px;font-size:16px;color:var(--bg);margin-bottom:8px}
-  .asap-check input{
+  .field h3{margin-top:2px}
+  .time-option{display:flex;align-items:center;gap:7px;font-size:16px;color:var(--bg);margin-bottom:10px}
+  .time-option input{
     appearance:none;-webkit-appearance:none;-moz-appearance:none;
     width:13px;height:13px;flex-shrink:0;margin:0;padding:0;
     border:1.5px solid var(--olive);border-radius:50%;
     background:#fff;position:relative;cursor:pointer;
     vertical-align:middle;
   }
-  .asap-check input:checked{background:var(--olive)}
-  .asap-check input:checked::after{
+  .time-option input:checked{background:var(--olive)}
+  .time-option input:checked::after{
     content:"";position:absolute;left:50%;top:50%;
     width:4.5px;height:4.5px;border-radius:50%;background:#fff;
     transform:translate(-50%,-50%);
   }
-  .asap-check span{line-height:1;display:inline-block;vertical-align:middle}
-  .asap-check .asap-label{font-weight:700}
-  .time-wheels{display:flex;align-items:center;justify-content:center;gap:10px;transition:opacity .2s}
+  .time-option span{line-height:1;display:inline-block;vertical-align:middle}
+  .time-option .asap-label{font-weight:700}
+  .time-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .time-row .time-option{margin-bottom:0}
+  .time-wheels{display:flex;align-items:center;gap:6px;transition:opacity .2s}
   .time-wheels.disabled{opacity:.35;pointer-events:none}
   .time-wheels select{
-    flex:0 1 108px;width:auto;
+    flex:0 1 66px;width:auto;padding:10px 4px;
     text-align:center;text-align-last:center;-moz-text-align-last:center;
   }
   .time-wheels .colon{font-size:18px;font-weight:700;color:var(--wine)}
@@ -295,14 +298,19 @@
       </div>
     </div>
     <div class="field">
-      <label>理想預計取餐時間</label>
-      <label class="asap-check">
-        <input type="checkbox" id="fAsap" checked><span class="asap-label">儘快取餐（現場稍後）</span>
+      <h3 class="serif">取餐時間選項</h3>
+      <label class="time-option">
+        <input type="radio" name="pickupMode" id="fAsap" value="asap" checked><span class="asap-label">儘快取餐（現場稍後）</span>
       </label>
-      <div class="time-wheels disabled" id="timeWheels">
-        <select id="fHour"></select>
-        <span class="colon">：</span>
-        <select id="fMinute"></select>
+      <div class="time-row">
+        <label class="time-option">
+          <input type="radio" name="pickupMode" id="fSpecify" value="specify"><span class="asap-label">指定時間取餐</span>
+        </label>
+        <div class="time-wheels disabled" id="timeWheels">
+          <select id="fHour"></select>
+          <span class="colon">：</span>
+          <select id="fMinute"></select>
+        </div>
       </div>
     </div>
     <div class="field">
@@ -505,8 +513,10 @@ function renderTimeWheels(){
   $("fMinute").innerHTML = mOpts.join("");
 }
 
-$("fAsap").addEventListener("change", ()=>{
-  $("timeWheels").classList.toggle("disabled", $("fAsap").checked);
+document.querySelectorAll('input[name="pickupMode"]').forEach(r=>{
+  r.addEventListener("change", ()=>{
+    $("timeWheels").classList.toggle("disabled", $("fAsap").checked);
+  });
 });
 
 function renderSum(){
