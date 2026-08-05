@@ -209,8 +209,20 @@
   .btn-return{background:#FBFAEA;color:var(--bg);border:1px solid var(--wine)}
   .hint{font-size:11px;color:#8B885F;text-align:center;margin-top:10px;letter-spacing:1px}
   .asap-check{display:flex;align-items:center;gap:9px;font-size:16px;color:var(--bg);margin-bottom:8px}
-  .asap-check input{width:14px;height:14px;flex-shrink:0;accent-color:var(--olive)}
-  .asap-check span{line-height:1.3}
+  .asap-check input{
+    appearance:none;-webkit-appearance:none;
+    width:18px;height:18px;flex-shrink:0;margin:0;
+    border:2px solid var(--olive);border-radius:50%;
+    background:#fff;position:relative;cursor:pointer;
+  }
+  .asap-check input:checked{background:var(--olive)}
+  .asap-check input:checked::after{
+    content:"";position:absolute;left:50%;top:50%;
+    width:6px;height:6px;border-radius:50%;background:#fff;
+    transform:translate(-50%,-50%);
+  }
+  .asap-check span{line-height:1;display:inline-block}
+  .asap-check .asap-label{font-weight:700}
   .time-wheels{display:flex;align-items:center;gap:10px;transition:opacity .2s}
   .time-wheels.disabled{opacity:.35;pointer-events:none}
   .time-wheels select{flex:1;text-align:center}
@@ -281,7 +293,7 @@
     <div class="field">
       <label>理想預計取餐時間</label>
       <label class="asap-check">
-        <input type="checkbox" id="fAsap" checked> <span>盡快取餐（現場稍候）</span>
+        <input type="checkbox" id="fAsap" checked> <span class="asap-label">儘快取餐（現場稍後）</span>
       </label>
       <div class="time-wheels disabled" id="timeWheels">
         <select id="fHour"></select>
@@ -512,7 +524,7 @@ function buildOrder(){
   lines.push("━━━━━━━━━━");
   lines.push(`合計：${cups} 杯　$${amt}`);
   const timeStr = $("fAsap").checked
-    ? "盡快取餐（現場稍候）"
+    ? "儘快取餐（現場稍後）"
     : `${String($("fHour").value).padStart(2,"0")}:${String($("fMinute").value).padStart(2,"0")}`;
   lines.push(`取餐時間：${timeStr}`);
   const name = $("fName").value.trim(), phone = $("fPhone").value.trim(), note = $("fNote").value.trim();
