@@ -530,7 +530,7 @@ function renderSum(){
 }
 
 function buildOrder(){
-  const lines = ["🍹 果藝所 訂單", "━━━━━━━━━━"];
+  const lines = [];
   CONFIG.MENU.forEach((m,i)=>{
     if(qty[i]>0) lines.push(`${m.name} ×${qty[i]}　$${qty[i]*unitPrice(m)}`);
   });
